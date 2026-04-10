@@ -22,10 +22,8 @@ python ai_news_scraper.py
 
 ## Sample Output
 
-5\. Reverse engineering Gemini's SynthID detection
-
-   Score : 155 points
-
-   Link  : https://github.com/aloshdenny/reverse-SynthID
+Reverse engineering Gemini's SynthID detection
+Score : 155 points
+Link  : https://github.com/aloshdenny/reverse-SynthID
 
 ## Author : Saurav
