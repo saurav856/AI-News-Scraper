@@ -26,40 +26,42 @@ def is_ai_related(title):
     title_lower = title.lower()
     return any(keyword in title_lower for keyword in AI_KEYWORDS)
 
-
-def scrape_ai_news():
-    # scrape hacker news and return only AI related stories
-    soup = fetch_page(HN_URL)
+def scrape_ai_news(pages=3):
+    # scrape multiple pages of hacker news and return only AI related stories
     stories = []
 
-    title_rows = soup.select("tr.athing")
-    subtext_rows = soup.select("td.subtext")
+    for page in range(1, pages + 1):
+        url = f"{HN_URL}news?p={page}"
+        print(f"Scraping page {page}...")
+        soup = fetch_page(url)
 
-    for title_row, subtext_row in zip(title_rows, subtext_rows):
-        title_tag = title_row.select_one("span.titleline > a")
-        if not title_tag:
-            continue
+        title_rows = soup.select("tr.athing")
+        subtext_rows = soup.select("td.subtext")
 
-        title = title_tag.get_text()
-        link = title_tag.get("href", "")
+        for title_row, subtext_row in zip(title_rows, subtext_rows):
+            title_tag = title_row.select_one("span.titleline > a")
+            if not title_tag:
+                continue
 
-        # if link is relative, make it absolute
-        if link.startswith("item?"):
-            link = HN_URL + link
+            title = title_tag.get_text()
+            link = title_tag.get("href", "")
 
-        score_tag = subtext_row.select_one("span.score")
-        score = score_tag.get_text() if score_tag else "0 points"
+            # if link is relative, make it absolute
+            if link.startswith("item?"):
+                link = HN_URL + link
 
-        # only add story if it is AI related
-        if is_ai_related(title):
-            stories.append({
-                "title": title,
-                "score": score,
-                "link": link
-            })
+            score_tag = subtext_row.select_one("span.score")
+            score = score_tag.get_text() if score_tag else "0 points"
+
+            # only add story if it is AI related
+            if is_ai_related(title):
+                stories.append({
+                    "title": title,
+                    "score": score,
+                    "link": link
+                })
 
     return stories
-
 
 def save_to_csv(stories):
     # save the stories to a csv file with timestamp in filename
